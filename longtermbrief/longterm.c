@@ -253,7 +253,7 @@ void fake_output( n_constant_string value ) {
     printf("%s\n", value);
 }
 
-void python_init(void) {
+void lib_init(void) {
     sim_set_console_input( &fake_input);
     sim_set_console_output( &fake_output );
     
@@ -266,15 +266,15 @@ void python_init(void) {
     sim_init( KIND_START_UP, rand(), MAP_AREA, 0 );
 }
 
-void python_close(void) {
+void lib_close(void) {
     sim_close();
 }
 
-int python_quit_check(void) {
+int lib_quit_check(void) {
     return (sim_thread_console_quit() == 0);
 }
 
-void python_check_string(char * incoming) {
+void lib_check_string(char * incoming) {
     memory_erase((n_byte*)fake_input_string, STRING_BLOCK_SIZE);
     memory_copy((n_byte *)incoming, (n_byte *)fake_input_string, strlen(incoming));
     fake_input_string_present = 1;
@@ -286,20 +286,20 @@ void python_check_string(char * incoming) {
     }
 }
 
-#if 1
+#ifndef MAIN_LIBRARY
 
 int main( int argc, n_string argv[] )
 {
-    python_init();
+    lib_init();
     
-    while ( python_quit_check() )
+    while ( lib_quit_check() )
     {
         n_string_block example = {0};
         fgets( example, STRING_BLOCK_SIZE, stdin );
-        python_check_string(example);
+        lib_check_string(example);
     }
     
-    python_close();
+    lib_close();
 
     return 1;
 }
