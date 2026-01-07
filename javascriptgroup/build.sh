@@ -1,56 +1,54 @@
-#!/bin/bash
-#	build.sh
-#
-#	=============================================================
-#
-#   Copyright 1996-2026 Tom Barbalet. All rights reserved.
-#
-#   Permission is hereby granted, free of charge, to any person
-#   obtaining a copy of this software and associated documentation
-#   files (the "Software"), to deal in the Software without
-#   restriction, including without limitation the rights to use,
-#   copy, modify, merge, publish, distribute, sublicense, and/or
-#   sell copies of the Software, and to permit persons to whom the
-#   Software is furnished to do so, subject to the following
-#   conditions:
-#
-#   The above copyright notice and this permission notice shall be
-#	included in all copies or substantial portions of the Software.
-#
-#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-#   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-#   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-#   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-#   HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-#   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-#   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-#   OTHER DEALINGS IN THE SOFTWARE.
+#!/bin/sh
+set -eu
 
-if [ $# -ge 1 -a "$1" == "--debug" ]
-then
-    CFLAGS=-g
-else
-    CFLAGS=-O2 
+# POSIX build script for javascriptgroup
+# Produces executable at ../simape
+
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT_DIR"
+
+CC="${CC:-cc}"
+
+CFLAGS="-O2"
+if [ "${1:-}" = "--debug" ]; then
+  CFLAGS="-g -O0"
 fi
 
-if [ $# -ge 1 -a "$1" == "--additional" ]
-then
-COMMANDLINEE=-DNOTHING_NEEDED_HERE
-else
-COMMANDLINEE=-DCOMMAND_LINE_EXPLICIT
+DEFS="-DCOMMAND_LINE_EXPLICIT"
+
+INCLUDES="
+-I$ROOT_DIR
+-I$ROOT_DIR/toolkit
+-I$ROOT_DIR/sim
+-I$ROOT_DIR/universe
+-I$ROOT_DIR/entity
+"
+
+WARNINGS="-w"
+LDLIBS="-lz -lm -lpthread"
+
+BUILD_DIR="$ROOT_DIR/build"
+OBJ_DIR="$BUILD_DIR/obj"
+mkdir -p "$OBJ_DIR"
+
+# Create a deterministic source list (avoid pipeline/subshell variable loss)
+SRC_LIST="$BUILD_DIR/sources.txt"
+find "$ROOT_DIR" -maxdepth 2 -type f \(      -path "$ROOT_DIR/toolkit/*.c"   -o -path "$ROOT_DIR/sim/*.c"   -o -path "$ROOT_DIR/universe/*.c"   -o -path "$ROOT_DIR/entity/*.c"   -o -path "$ROOT_DIR/longterm.c" \) | sort > "$SRC_LIST"
+
+if [ ! -s "$SRC_LIST" ]; then
+  echo "No sources found (expected toolkit/, sim/, universe/, entity/, and longterm.c)."
+  exit 1
 fi
 
-gcc ${CFLAGS} ${COMMANDLINEE} -c ./*.c -lz -lm -lpthread -w
+OBJS=""
+while IFS= read -r src; do
+  rel="${src#$ROOT_DIR/}"
+  obj="$OBJ_DIR/$(printf "%s" "$rel" | tr '/' '_').o"
+  OBJS="$OBJS $obj"
+  $CC $CFLAGS $DEFS $INCLUDES $WARNINGS -c "$src" -o "$obj"
+done < "$SRC_LIST"
 
-if [ $? -ne 0 ]
-then
-exit 1
-fi
+OUT="$ROOT_DIR/../simape"
+$CC $CFLAGS $OBJS -o "$OUT" $LDLIBS
 
-gcc ${CFLAGS} ${COMMANDLINEE} -I/usr/include -o ./../simape *.o -lz -lm -lpthread
-if [ $? -ne 0 ]
-then
-exit 1
-fi
-
-rm *.o
+echo "==> Built: $OUT"

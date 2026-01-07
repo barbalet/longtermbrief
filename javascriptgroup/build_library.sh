@@ -1,40 +1,72 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
-# Build a reusable library version of longtermbrief.
-#
-# This compiles the exact same C sources as build.sh, but:
-#   - defines MAIN_LIBRARY so longterm.c does NOT provide a main()
-#   - defines COMMAND_LINE_EXPLICIT to keep console command handling enabled
-#   - produces:
-#       liblongtermbrief.a   (static)
-#       liblongtermbrief.*   (shared; .dylib on macOS, .so on Linux)
+# POSIX library build script for javascriptgroup
+# Produces:
+#   build/lib/liblongtermbrief.a
+#   build/lib/liblongtermbrief.(dylib|so)
 
-if [ $# -ge 1 ] && [ "$1" = "--debug" ]; then
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT_DIR"
+
+CC="${CC:-cc}"
+
+CFLAGS="-O2"
+if [ "${1:-}" = "--debug" ]; then
   CFLAGS="-g -O0"
-else
-  CFLAGS="-O2"
 fi
 
 DEFS="-DMAIN_LIBRARY -DCOMMAND_LINE_EXPLICIT"
 
-echo "==> Building longtermbrief library (MAIN_LIBRARY)"
+INCLUDES="
+-I$ROOT_DIR
+-I$ROOT_DIR/toolkit
+-I$ROOT_DIR/sim
+-I$ROOT_DIR/universe
+-I$ROOT_DIR/entity
+"
 
-rm -f ./*.o liblongtermbrief.a liblongtermbrief.so liblongtermbrief.dylib 2>/dev/null || true
+WARNINGS="-w"
+LDLIBS="-lz -lm -lpthread"
 
-cc ${CFLAGS} ${DEFS} -fPIC -c ./*.c -w
+BUILD_DIR="$ROOT_DIR/build"
+OBJ_DIR="$BUILD_DIR/obj_lib"
+LIB_DIR="$BUILD_DIR/lib"
+mkdir -p "$OBJ_DIR" "$LIB_DIR"
 
-ar rcs liblongtermbrief.a ./*.o
+SRC_LIST="$BUILD_DIR/sources_lib.txt"
+find "$ROOT_DIR" -maxdepth 2 -type f \(      -path "$ROOT_DIR/toolkit/*.c"   -o -path "$ROOT_DIR/sim/*.c"   -o -path "$ROOT_DIR/universe/*.c"   -o -path "$ROOT_DIR/entity/*.c"   -o -path "$ROOT_DIR/longterm.c" \) | sort > "$SRC_LIST"
 
-UNAME_S="$(uname -s || echo unknown)"
-if [ "$UNAME_S" = "Darwin" ]; then
-  cc -shared -o liblongtermbrief.dylib ./*.o -lz -lm -lpthread
-  echo "==> Wrote liblongtermbrief.dylib"
-else
-  cc -shared -o liblongtermbrief.so ./*.o -lz -lm -lpthread
-  echo "==> Wrote liblongtermbrief.so"
+if [ ! -s "$SRC_LIST" ]; then
+  echo "No sources found (expected toolkit/, sim/, universe/, entity/, and longterm.c)."
+  exit 1
 fi
 
-rm -f ./*.o
-echo "==> Wrote liblongtermbrief.a"
+OBJS=""
+while IFS= read -r src; do
+  rel="${src#$ROOT_DIR/}"
+  obj="$OBJ_DIR/$(printf "%s" "$rel" | tr '/' '_').o"
+  OBJS="$OBJS $obj"
+  $CC $CFLAGS $DEFS $INCLUDES $WARNINGS -c "$src" -o "$obj"
+done < "$SRC_LIST"
+
+# Static library
+STATIC_LIB="$LIB_DIR/liblongtermbrief.a"
+rm -f "$STATIC_LIB"
+# shellcheck disable=SC2086
+ar rcs "$STATIC_LIB" $OBJS
+echo "==> Wrote $STATIC_LIB"
+
+# Shared library
+UNAME_S="$(uname -s)"
+if [ "$UNAME_S" = "Darwin" ]; then
+  SHARED_LIB="$LIB_DIR/liblongtermbrief.dylib"
+else
+  SHARED_LIB="$LIB_DIR/liblongtermbrief.so"
+fi
+
+# shellcheck disable=SC2086
+$CC -shared -o "$SHARED_LIB" $OBJS $LDLIBS
+echo "==> Wrote $SHARED_LIB"
+
 echo "==> Done."
