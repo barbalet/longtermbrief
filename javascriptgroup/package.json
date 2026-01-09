@@ -1,0 +1,10 @@
+{
+  "name": "javascriptgroup-js-port",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node longterm.js",
+    "lint": "node -c longterm.js"
+  }
+}
