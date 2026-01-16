@@ -617,7 +617,6 @@ n_int      io_command_line_execution( void );
 void       io_lower( n_string value, n_int length );
 void       io_whitespace( n_file *input );
 void       io_whitespace_json( n_file *input );
-void       io_audit_file( const simulated_file_entry *format, n_byte section_to_audit );
 void       io_string_write( n_string dest, n_string insert, n_int *pos );
 n_int      io_read_bin( n_file *fil, n_byte *local_byte );
 n_int      io_file_write( n_file *fil, n_byte byte );
