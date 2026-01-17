@@ -65,7 +65,7 @@ n_int sim_new_run_condition( void )
 
 static void sim_console_clean_up( void )
 {
-    if ( ( io_command_line_execution() == 0 ) || sim_quit_value )
+    if ( ( console_line_execution_get() == 0 ) || sim_quit_value )
     {
         return;
     }
@@ -110,7 +110,7 @@ static void *sim_thread_posix( void *threadid )
 
 void sim_thread_console( void )
 {
-    if ( io_command_line_execution() == 0 )
+    if ( console_line_execution_get() == 0 )
     {
         return;
     }
@@ -138,7 +138,7 @@ void sim_console( n_string simulation_filename, n_uint randomise )
     printf( "\n *** %sConsole, %s ***\n", SHORT_VERSION_NAME, FULL_DATE );
     printf( "      For a list of commands type 'help'\n\n" );
 
-    io_command_line_execution_set();
+    console_line_execution_set();
     sim_init( KIND_START_UP, randomise, MAP_AREA, 0 );
 
 #ifndef    _WIN32
@@ -1370,7 +1370,7 @@ void *sim_init( KIND_OF_USE kind, n_uint randomise, n_uint offscreen_size, n_uin
             interpret = 0L;
         }
 #endif
-        memory_execute(io_command_line_execution_set);
+        memory_execute(io_console_line_execution_set);
     }
     timing.real_time = randomise;
     timing.last_time = randomise;

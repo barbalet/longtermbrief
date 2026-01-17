@@ -163,7 +163,7 @@ void lib_init(void) {
     printf( "\n *** %sConsole, %s ***\n", SHORT_VERSION_NAME, FULL_DATE );
     printf( "      For a list of commands type 'help'\n\n" );
 
-    io_command_line_execution_set();
+    console_line_execution_set();
     sim_init( KIND_START_UP, rand(), MAP_AREA, 0 );
 }
 

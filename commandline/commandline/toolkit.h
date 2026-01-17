@@ -611,8 +611,8 @@ void       io_string_number( n_string output_string, n_string input_string, n_ui
 void       io_three_strings( n_string output_string, n_string first_string, n_string second_string, n_string third_string, n_byte new_line );
 
 void       io_entry_execution( n_int argc, n_string *argv );
-void       io_command_line_execution_set( void );
-n_int      io_command_line_execution( void );
+void       console_line_execution_set( void );
+n_int      console_line_execution_get( void );
 
 void       io_lower( n_string value, n_int length );
 void       io_whitespace( n_file *input );

@@ -21,17 +21,17 @@
 
 simulated_console_command *local_commands = 0L;
 
-static n_int command_line_execution;
-static n_int command_line_external_exit = 0;
+static n_int console_line_execution;
+static n_int console_line_external_exit = 0;
 
-void  io_command_line_execution_set( void )
+void  console_line_execution_set( void )
 {
-    command_line_execution = 1;
+    console_line_execution = 1;
 }
 
-n_int io_command_line_execution( void )
+n_int console_line_execution_get( void )
 {
-    return command_line_execution;
+    return console_line_execution;
 }
 
 void io_entry_execution( n_int argc, n_string *argv )
@@ -40,7 +40,7 @@ void io_entry_execution( n_int argc, n_string *argv )
     {
         if ( ( argc == 2 ) && ( argv[1][1] == 'c' ) )
         {
-            io_command_line_execution_set();
+            console_line_execution_set();
         }
     }
 }
@@ -124,7 +124,7 @@ void io_console_out( n_constant_string value )
 
 void io_console_quit( void )
 {
-    command_line_external_exit = 1;
+    console_line_external_exit = 1;
 }
 
 n_int io_console( void *ptr, simulated_console_command *commands, n_console_input input_function, n_console_output output_function )
@@ -168,7 +168,7 @@ n_int io_console( void *ptr, simulated_console_command *commands, n_console_inpu
                     if ( IS_SPACE( buffer[count] ) )
                     {
                         return_value = ( *function )( ptr, ( n_string )&buffer[count + 1], output_function );
-                        if ( command_line_external_exit )
+                        if ( console_line_external_exit )
                         {
                             return 1;
                         }
@@ -177,7 +177,7 @@ n_int io_console( void *ptr, simulated_console_command *commands, n_console_inpu
                     else if ( buffer[count] == 0 )
                     {
                         return_value = ( *function )( ptr, 0L, output_function );
-                        if ( command_line_external_exit )
+                        if ( console_line_external_exit )
                         {
                             return 1;
                         }
