@@ -610,7 +610,7 @@ void       io_number_to_string( n_string value, n_uint number );
 void       io_string_number( n_string output_string, n_string input_string, n_uint number );
 void       io_three_strings( n_string output_string, n_string first_string, n_string second_string, n_string third_string, n_byte new_line );
 
-void       io_entry_execution( n_int argc, n_string *argv );
+void       console_entry_execution( n_int argc, n_string *argv );
 void       console_line_execution_set( void );
 n_int      console_line_execution_get( void );
 
@@ -781,16 +781,16 @@ n_int      audio_aiff_is_header( void *fptr, n_uint *samples );
 
 void       audio_aiff_body( void *fptr, n_audio *samples, n_uint number_samples );
 
-n_int      io_quit( void *ptr, n_string response, n_console_output output_function );
-n_int      io_help( void *ptr, n_string response, n_console_output output_function );
-n_string   io_console_entry_clean( n_string string, n_int length );
-n_string   io_console_entry( n_string string, n_int length );
-void       io_console_out( n_constant_string value );
-n_int      io_console( void *ptr, simulated_console_command *commands, n_console_input input_function, n_console_output output_function );
+n_int      console_quit( void *ptr, n_string response, n_console_output output_function );
+n_int      console_help( void *ptr, n_string response, n_console_output output_function );
+n_string   console_entry_clean( n_string string, n_int length );
+n_string   console_entry( n_string string, n_int length );
+void       console_out( n_constant_string value );
+n_int      console_cycle( void *ptr, simulated_console_command *commands, n_console_input input_function, n_console_output output_function );
 
-void       io_help_line( simulated_console_command *specific, n_console_output output_function );
+void       console_help_line( simulated_console_command *specific, n_console_output output_function );
 
-void       io_console_quit( void );
+void       console_quit_base( void );
 
 #endif /* _TOOLKIT_H_ */
 

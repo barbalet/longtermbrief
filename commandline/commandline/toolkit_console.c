@@ -34,7 +34,7 @@ n_int console_line_execution_get( void )
     return console_line_execution;
 }
 
-void io_entry_execution( n_int argc, n_string *argv )
+void console_entry_execution( n_int argc, n_string *argv )
 {
     if ( argv )
     {
@@ -46,14 +46,14 @@ void io_entry_execution( n_int argc, n_string *argv )
 }
 
 
-void io_help_line( simulated_console_command *specific, n_console_output output_function )
+void console_help_line( simulated_console_command *specific, n_console_output output_function )
 {
     n_string_block  string_line = {0};
     io_three_string_combination( string_line, specific->command, specific->addition, specific->help_information, 28 );
     output_function( string_line );
 }
 
-n_int io_help( void *ptr, n_string response, n_console_output output_function )
+n_int console_help( void *ptr, n_string response, n_console_output output_function )
 {
     n_int loop = 0;
     n_int response_len = 0;
@@ -77,7 +77,7 @@ n_int io_help( void *ptr, n_string response, n_console_output output_function )
             {
                 if ( response_len == 0 )
                 {
-                    io_help_line( &local_commands[loop], output_function );
+                    console_help_line( &local_commands[loop], output_function );
                 }
                 else
                 {
@@ -85,7 +85,7 @@ n_int io_help( void *ptr, n_string response, n_console_output output_function )
                     n_int count = io_find( response, 0, response_len, local_commands[loop].command, command_len );
                     if ( count == command_len )
                     {
-                        io_help_line( &local_commands[loop], output_function );
+                        console_help_line( &local_commands[loop], output_function );
                         found = 1;
                     }
                 }
@@ -101,33 +101,33 @@ n_int io_help( void *ptr, n_string response, n_console_output output_function )
     return 0;
 }
 
-n_int io_quit( void *ptr, n_string response, n_console_output output_function )
+n_int console_quit( void *ptr, n_string response, n_console_output output_function )
 {
     return 1;
 }
 
-n_string io_console_entry_clean( n_string string, n_int length )
+n_string console_entry_clean( n_string string, n_int length )
 {
     return fgets( string, ( int )length, stdin );
 }
 
-n_string io_console_entry( n_string string, n_int length )
+n_string console_entry( n_string string, n_int length )
 {
-    return io_console_entry_clean( string, length );
+    return console_entry_clean( string, length );
 }
 
-void io_console_out( n_constant_string value )
+void console_out( n_constant_string value )
 {
     printf( "%s\n", value );
     fflush( stdout );
 }
 
-void io_console_quit( void )
+void console_quit_base( void )
 {
     console_line_external_exit = 1;
 }
 
-n_int io_console( void *ptr, simulated_console_command *commands, n_console_input input_function, n_console_output output_function )
+n_int console_cycle( void *ptr, simulated_console_command *commands, n_console_input input_function, n_console_output output_function )
 {
     n_string_block buffer;
 

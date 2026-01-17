@@ -78,8 +78,8 @@ static void sim_console_clean_up( void )
 }
 
 
-static n_console_input *input_function = &io_console_entry_clean;
-static n_console_output *output_function = &io_console_out;
+static n_console_input *input_function = &console_entry_clean;
+static n_console_output *output_function = &console_out;
 
 void sim_set_console_input( n_console_input *local_input_function )
 {
@@ -100,7 +100,7 @@ void sim_set_console_output( n_console_output *local_output_function )
 static void *sim_thread_posix( void *threadid )
 {
     n_byte *local = ( n_byte * )threadid;
-    if ( io_console( &group, ( simulated_console_command * ) control_commands, *input_function, *output_function ) != 0 )
+    if ( console_cycle( &group, ( simulated_console_command * ) control_commands, *input_function, *output_function ) != 0 )
     {
         sim_console_clean_up();
     }
@@ -151,10 +151,10 @@ void sim_console( n_string simulation_filename, n_uint randomise )
     {
         do
         {}
-        while ( io_console( &group,
+        while ( console_cycle( &group,
                             ( simulated_console_command * )control_commands,
-                            io_console_entry,
-                            io_console_out ) == 0 );
+                            console_entry,
+                            console_out ) == 0 );
     }
 #endif
     sim_close();
@@ -1370,7 +1370,7 @@ void *sim_init( KIND_OF_USE kind, n_uint randomise, n_uint offscreen_size, n_uin
             interpret = 0L;
         }
 #endif
-        memory_execute(io_console_line_execution_set);
+        memory_execute(console_line_execution_set);
     }
     timing.real_time = randomise;
     timing.last_time = randomise;
@@ -1419,7 +1419,7 @@ void *sim_init( KIND_OF_USE kind, n_uint randomise, n_uint offscreen_size, n_uin
 void sim_close( void )
 {
     command_quit( 0L, 0L, 0L );
-    io_console_quit();
+    console_quit_base();
 #ifndef _WIN32
     sim_console_clean_up();
 #endif

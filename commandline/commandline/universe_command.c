@@ -2311,6 +2311,6 @@ n_int command_quit( void *ptr, n_string response, n_console_output output_functi
     simulation_executing = 0;
 
     ( void )command_stop( ptr, response, output_function );
-    return io_quit( ptr, response, output_function );
+    return console_quit( ptr, response, output_function );
 }
 

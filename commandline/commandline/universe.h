@@ -1177,7 +1177,7 @@ void sim_console( n_string simulation_filename, n_uint randomise );
 
 const static simulated_console_command control_commands[] =
 {
-    {&io_help,               "help",           "[(command)]",          "Displays a list of all the commands"},
+    {&console_help,               "help",           "[(command)]",          "Displays a list of all the commands"},
 #ifdef COMMAND_LINE_EXPLICIT
     {&command_reset,         "reset",          "",                     "Reset the simulation"},
     {&command_reset,         "clear"           "",                     ""},
