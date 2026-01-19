@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4AA0118B2F1DE95E00996A27 /* toolkit_console.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A93B6D82F1DB87C002C16ED /* toolkit_console.c */; };
+		4AA0118C2F1DE95E00996A27 /* toolkit_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A93B6D92F1DB87C002C16ED /* toolkit_io.c */; };
+		4AA0118D2F1DE95E00996A27 /* toolkit_math.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A93B6DA2F1DB87C002C16ED /* toolkit_math.c */; };
+		4AA0118E2F1DE95E00996A27 /* toolkit_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A93B6DB2F1DB87C002C16ED /* toolkit_memory.c */; };
+		4AA0118F2F1DE95E00996A27 /* toolkit_vect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A93B6DC2F1DB87C002C16ED /* toolkit_vect.c */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		4A93B6CA2F1DB815002C16ED /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -140,6 +148,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4AA0118B2F1DE95E00996A27 /* toolkit_console.c in Sources */,
+				4AA0118C2F1DE95E00996A27 /* toolkit_io.c in Sources */,
+				4AA0118D2F1DE95E00996A27 /* toolkit_math.c in Sources */,
+				4AA0118E2F1DE95E00996A27 /* toolkit_memory.c in Sources */,
+				4AA0118F2F1DE95E00996A27 /* toolkit_vect.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,7 +1,7 @@
 
 /****************************************************************
 
- console.c
+ toolkit_console.c
 
  =============================================================
 
@@ -9,7 +9,7 @@
 
  ****************************************************************/
 
-/*! \file   n_console.c
+/*! \file   toolkit_console.c
  *  \brief  Covers the low level input and output relating to console.
  */
 
