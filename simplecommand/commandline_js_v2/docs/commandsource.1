@@ -1,0 +1,44 @@
+.TH COMMANDSOURCE 1 "January 2026" "commandsource" "User Commands"
+.SH NAME
+commandsource \- simple command console (Node.js)
+.SH SYNOPSIS
+.B commandsource
+[\fB--run\fR \fIN\fR] [\fB--prompt\fR \fITEXT\fR] [\fB--no-prompt\fR] [\fB--help\fR]
+.SH DESCRIPTION
+commandsource is a small interactive command console ported from a C implementation.
+It provides a minimal prompt, a `help` command, and clean shutdown behavior.
+
+.SH OPTIONS
+.TP
+.BR -h , " " --help
+Show help and exit.
+.TP
+.BR --run " " N
+Exit after N commands have been processed.
+.TP
+.BR --prompt " " TEXT
+Set the prompt string (default: "> ").
+.TP
+.BR --no-prompt
+Disable prompt output (useful when piping input).
+
+.SH COMMANDS
+.TP
+.B help [command]
+List available commands or show a single command.
+.TP
+.B quit
+Exit the console.
+.SH EXAMPLES
+Run interactively:
+.IP
+.nf
+commandsource
+.fi
+Pipe commands and exit after 3 lines:
+.IP
+.nf
+printf "help\nhelp quit\nquit\n" | commandsource --no-prompt --run 3
+.fi
+.SH EXIT STATUS
+0 on normal exit, non-zero on internal error.
