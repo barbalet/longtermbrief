@@ -42,7 +42,12 @@ class SimulatedBeing {
     this.id = id >>> 0;
     this.gender = randInt(rng, 2); // 0 male, 1 female
     this.firstName = this.gender === 0 ? FIRST_NAMES_M[randInt(rng, FIRST_NAMES_M.length)] : FIRST_NAMES_F[randInt(rng, FIRST_NAMES_F.length)];
-    this.familyName = FAMILY_NAMES[randInt(rng, FAMILY_NAMES.length)];
+    this.familyName1 = FAMILY_NAMES[randInt(rng, FAMILY_NAMES.length)];
+    // Prefer a different second family name for a "double‑barrelled" surname.
+    do {
+      this.familyName2 = FAMILY_NAMES[randInt(rng, FAMILY_NAMES.length)];
+    } while (this.familyName2 === this.familyName1 && FAMILY_NAMES.length > 1);
+
     this.ageDays = randInt(rng, 365 * 30); // up to ~30 years
     this.health = 50 + randInt(rng, 51); // 50..100
     this.energy = 50 + randInt(rng, 51);
@@ -60,7 +65,7 @@ class SimulatedBeing {
   }
 
   get displayName() {
-    return `${this.firstName} ${this.familyName}`;
+    return `${this.firstName} ${this.familyName1}-${this.familyName2}`;
   }
 }
 

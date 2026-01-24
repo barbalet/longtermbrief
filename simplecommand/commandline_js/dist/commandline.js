@@ -48,7 +48,12 @@ class SimulatedBeing {
     this.id = id >>> 0;
     this.gender = randInt(rng, 2); // 0 male, 1 female
     this.firstName = this.gender === 0 ? FIRST_NAMES_M[randInt(rng, FIRST_NAMES_M.length)] : FIRST_NAMES_F[randInt(rng, FIRST_NAMES_F.length)];
-    this.familyName = FAMILY_NAMES[randInt(rng, FAMILY_NAMES.length)];
+    this.familyName1 = FAMILY_NAMES[randInt(rng, FAMILY_NAMES.length)];
+    // Prefer a different second family name for a "double‑barrelled" surname.
+    do {
+      this.familyName2 = FAMILY_NAMES[randInt(rng, FAMILY_NAMES.length)];
+    } while (this.familyName2 === this.familyName1 && FAMILY_NAMES.length > 1);
+
     this.ageDays = randInt(rng, 365 * 30); // up to ~30 years
     this.health = 50 + randInt(rng, 51); // 50..100
     this.energy = 50 + randInt(rng, 51);
@@ -66,7 +71,7 @@ class SimulatedBeing {
   }
 
   get displayName() {
-    return `${this.firstName} ${this.familyName}`;
+    return `${this.firstName} ${this.familyName1}-${this.familyName2}`;
   }
 }
 
@@ -1846,9 +1851,91 @@ function command_event(ptr, response, output) {
 }
 
 function command_list(ptr, response, output) {
-  const names = ptr.beings.filter((b) => b && b.alive).map((b) => b.displayName);
-  for (const n of names) output(n);
-  output(`${names.length} ape(s).`);
+  // Match the *spirit* of the original C "list" output, but with richer columns:
+  // one row per being including key fields, alongside the double‑barrelled name.
+  //
+  // Columns (fixed width-ish):
+  //  idx  sel  name                         g  age(d)  hp  en  braincode   soc  epi  path  alive
+  //
+  // NOTE: The JS port currently has a reduced model; fields shown are whatever
+  // exists on the current SimulatedBeing structure.
+
+  if (!ptr || !Array.isArray(ptr.beings) || ptr.beings.length === 0) {
+    output('No apes present. Try (re)running the Simulation.');
+    return 0;
+  }
+
+  const padR = (s, w) => {
+    s = String(s);
+    if (s.length >= w) return s.slice(0, w);
+    return s + ' '.repeat(w - s.length);
+  };
+  const padL = (s, w) => {
+    s = String(s);
+    if (s.length >= w) return s.slice(-w);
+    return ' '.repeat(w - s.length) + s;
+  };
+
+  const header =
+    `${padL('idx', 3)} ${padR('sel', 3)} ` +
+    `${padR('name', 28)} ` +
+    `${padR('g', 1)} ` +
+    `${padL('age', 6)} ` +
+    `${padL('hp', 3)} ` +
+    `${padL('en', 3)} ` +
+    `${padR('braincode', 10)} ` +
+    `${padL('soc', 3)} ` +
+    `${padL('epi', 3)} ` +
+    `${padL('pat', 3)} ` +
+    `${padR('alive', 5)}`;
+
+  output(header);
+  output('-'.repeat(header.length));
+
+  const selected = (ptr.selectedIndex >>> 0);
+
+  for (let i = 0; i < ptr.beings.length; i++) {
+    const b = ptr.beings[i];
+    if (!b) continue;
+
+    const sel = (i === selected) ? '*' : '';
+    const gender = b.gender === 0 ? 'M' : (b.gender === 1 ? 'F' : '?');
+
+    const name = b.displayName || '(unnamed)';
+    const hp = (b.health ?? 0);
+    const en = (b.energy ?? 0);
+
+    const brain = (typeof b.braincode === 'number')
+      ? ('0x' + (b.braincode >>> 0).toString(16).padStart(8, '0')).toUpperCase()
+      : '';
+
+    const soc =
+      (b.social && (b.social.friends?.length || b.social.enemies?.length || b.social.attraction?.length))
+        ? ( (b.social.friends?.length || 0) + (b.social.enemies?.length || 0) + (b.social.attraction?.length || 0) )
+        : 0;
+
+    const epi = Array.isArray(b.episodic) ? b.episodic.length : 0;
+    const pat = Array.isArray(b.pathogens) ? b.pathogens.length : 0;
+
+    const alive = b.alive ? 'yes' : 'no';
+
+    const line =
+      `${padL(i, 3)} ${padR(sel, 3)} ` +
+      `${padR(name, 28)} ` +
+      `${padR(gender, 1)} ` +
+      `${padL((b.ageDays ?? 0), 6)} ` +
+      `${padL(hp, 3)} ` +
+      `${padL(en, 3)} ` +
+      `${padR(brain, 10)} ` +
+      `${padL(soc, 3)} ` +
+      `${padL(epi, 3)} ` +
+      `${padL(pat, 3)} ` +
+      `${padR(alive, 5)}`;
+
+    output(line);
+  }
+
+  output(`${ptr.beings.length} ape(s). Selected: ${selected}.`);
   return 0;
 }
 
